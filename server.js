@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = 3000;
-const API_KEY = 'sk-7689b637f8164f4b87673685f0aa8177';
+const API_KEY = ' sk-7689b637f8164f4b87673685f0aa8177';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -18,6 +18,19 @@ const MIME = {
 };
 
 const server = http.createServer((req, res) => {
+  // 关键：处理跨域预检请求（OPTIONS）
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204, {
+      'Access-Control-Allow-Origin': 'https://mashashak0717.github.io', // 你的GitHub Pages地址
+      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400'
+    });
+    res.end();
+    return;
+  }
+
+  // 处理POST请求
   if (req.method === 'POST' && req.url === '/api/chat') {
     let body = '';
     req.on('data', chunk => body += chunk);
@@ -34,34 +47,52 @@ const server = http.createServer((req, res) => {
         let data = '';
         proxyRes.on('data', chunk => data += chunk);
         proxyRes.on('end', () => {
+          // 给POST请求加上跨域头
           res.writeHead(proxyRes.statusCode, {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
+            'Access-Control-Allow-Origin': 'https://mashashak0717.github.io' // 这里也要加上
           });
           res.end(data);
         });
       });
+
       proxyReq.on('error', err => {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: err.message }));
+        console.error(err);
+        res.writeHead(500, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': 'https://mashashak0717.github.io'
+        });
+        res.end(JSON.stringify({ error: 'API请求失败' }));
       });
-      var reqBody = JSON.parse(body);
-      reqBody.stream = false;
-      reqBody.temperature = 0.7;
-      proxyReq.write(JSON.stringify(reqBody));
+
+      proxyReq.write(body);
       proxyReq.end();
     });
     return;
   }
 
-  let filePath = req.url === '/' ? '/index.html' : req.url;
-  filePath = path.join(__dirname, filePath);
-  const ext = path.extname(filePath);
-  fs.readFile(filePath, (err, data) => {
-    if (err) { res.writeHead(404); res.end('Not Found'); return; }
-    res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
-    res.end(data);
+  // 静态文件服务（如果需要）
+  let filePath = '.' + req.url;
+  if (filePath === './') filePath = './index.html';
+  const extname = path.extname(filePath);
+  const contentType = MIME[extname] || 'text/plain';
+
+  fs.readFile(filePath, (err, content) => {
+    if (err) {
+      if (err.code === 'ENOENT') {
+        res.writeHead(404, { 'Content-Type': 'text/html' });
+        res.end('404 Not Found');
+      } else {
+        res.writeHead(500);
+        res.end('Server Error: ' + err.code);
+      }
+    } else {
+      res.writeHead(200, { 'Content-Type': contentType });
+      res.end(content, 'utf-8');
+    }
   });
 });
 
-server.listen(PORT, () => console.log('http://localhost:' + PORT));
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
