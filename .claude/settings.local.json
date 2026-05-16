@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(open *)",
+      "Bash(node *)",
+      "Bash(sed -i '' '2,3d' app.js)",
+      "Bash(sed -i '' '57,284d' app.js)"
+    ]
+  }
+}
