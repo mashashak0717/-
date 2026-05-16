@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>秒懂ta，会趣聊</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-orange-100 via-orange-50 to-yellow-100 font-sans antialiased">
+
+<div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 rounded-2xl shadow-lg text-sm font-medium hidden"></div>
+
+<div id="confirm-modal" class="hidden fixed inset-0 z-[90] flex items-center justify-center bg-black/25 backdrop-blur-sm">
+  <div class="bg-white rounded-2xl p-6 shadow-xl max-w-sm mx-4 w-full">
+    <p id="confirm-msg" class="text-gray-700 mb-5 text-center"></p>
+    <div class="flex gap-3 justify-center">
+      <button id="confirm-cancel" class="px-5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium transition">取消</button>
+      <button id="confirm-ok" class="px-5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-medium transition">确认删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- V1 首页 -->
+<div id="view-v1" class="view">
+  <div class="min-h-screen flex items-center justify-center px-4 py-10 relative overflow-hidden">
+    <span class="absolute top-[8%] left-[8%] text-3xl opacity-35 pointer-events-none hidden md:block">🌸</span>
+    <span class="absolute top-[12%] right-[6%] text-3xl opacity-35 pointer-events-none hidden md:block">🌿</span>
+    <span class="absolute bottom-[15%] left-[10%] text-3xl opacity-35 pointer-events-none hidden md:block">🌺</span>
+    <span class="absolute bottom-[10%] right-[8%] text-3xl opacity-35 pointer-events-none hidden md:block">🍃</span>
+    <span class="absolute top-[40%] left-[4%] text-3xl opacity-35 pointer-events-none hidden md:block">💮</span>
+    <span class="absolute top-[35%] right-[4%] text-3xl opacity-35 pointer-events-none hidden md:block">🌾</span>
+    <div class="bg-white/70 backdrop-blur-md rounded-3xl shadow-xl p-8 w-full mx-4 md:max-w-lg md:mx-auto relative z-10">
+      <div class="flex justify-center gap-4 mb-4">
+        <span class="text-5xl animate-bounce">🐱</span>
+        <span class="text-5xl animate-bounce" style="animation-delay:0.15s">🐰</span>
+      </div>
+      <h1 class="text-xl md:text-2xl font-bold text-center text-gray-800 mb-2">秒懂ta，会趣聊</h1>
+      <p class="text-sm text-center text-gray-500 mb-6">拆解ta的社交画像，轻松拿捏聊天话题与风格</p>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">名字 / 昵称</label>
+          <input id="v1-name" type="text" maxlength="10" placeholder="最多10个字" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white/60 focus:outline-none focus:ring-2 focus:ring-orange-300 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">性别</label>
+          <div class="flex gap-4">
+            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gender" value="男" class="accent-orange-500"><span class="text-sm">男</span></label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gender" value="女" class="accent-orange-500"><span class="text-sm">女</span></label>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">星座</label>
+          <select id="v1-zodiac" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white/60 focus:outline-none focus:ring-2 focus:ring-orange-300 text-sm">
+            <option value="">请选择</option>
+            <option>白羊座</option><option>金牛座</option><option>双子座</option><option>巨蟹座</option>
+            <option>狮子座</option><option>处女座</option><option>天秤座</option><option>天蝎座</option>
+            <option>射手座</option><option>摩羯座</option><option>水瓶座</option><option>双鱼座</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">MBTI</label>
+          <select id="v1-mbti" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white/60 focus:outline-none focus:ring-2 focus:ring-orange-300 text-sm">
+            <option value="">请选择</option>
+            <option>INTJ</option><option>INTP</option><option>ENTJ</option><option>ENTP</option>
+            <option>INFJ</option><option>INFP</option><option>ENFJ</option><option>ENFP</option>
+            <option>ISTJ</option><option>ISFJ</option><option>ESTJ</option><option>ESFJ</option>
+            <option>ISTP</option><option>ISFP</option><option>ESTP</option><option>ESFP</option>
+          </select>
+        </div>
+        <button id="v1-submit" class="w-full py-3 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-orange-400 to-pink-400 hover:from-orange-500 hover:to-pink-500 shadow-md hover:shadow-lg transition-all active:scale-[.98]">生成社交画像</button>
+      </div>
+      <p class="text-center mt-4"><a id="v1-to-v0" class="text-xs text-orange-400 hover:text-orange-500 cursor-pointer underline underline-offset-2">人物列表</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- V0 人物列表 -->
+<div id="view-v0" class="view hidden">
+  <div class="min-h-screen px-4 py-8 max-w-lg mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-lg md:text-xl font-bold text-gray-800">人物列表</h2>
+      <a id="v0-back" class="text-sm text-orange-500 hover:text-orange-600 cursor-pointer flex items-center gap-1"><i data-lucide="arrow-left" class="w-4 h-4"></i>返回首页</a>
+    </div>
+    <div id="v0-list" class="space-y-3"></div>
+    <div id="v0-empty" class="text-center text-gray-400 py-16 hidden">
+      <i data-lucide="users" class="w-12 h-12 mx-auto mb-3 opacity-40"></i>
+      <p class="text-sm">还没有保存的人物，去首页生成一个吧</p>
+    </div>
+  </div>
+</div>
+
+<!-- V2 加载页 -->
+<div id="view-v2" class="view hidden">
+  <div class="min-h-screen flex items-center justify-center px-4">
+    <div class="bg-white/70 backdrop-blur-md rounded-3xl shadow-xl p-10 w-4/5 md:max-w-sm text-center">
+      <div class="relative mb-8" id="v2-bar-wrap">
+        <span id="v2-cat" class="text-4xl absolute -top-9 left-0 animate-bounce">🐈</span>
+        <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+          <div id="v2-bar" class="h-full bg-gradient-to-r from-orange-400 to-pink-400 rounded-full" style="width:0%"></div>
+        </div>
+      </div>
+      <p id="v2-pct" class="text-base md:text-lg font-bold text-gray-600 mb-1">0%</p>
+      <p class="text-xs text-gray-400">正在分析社交画像...</p>
+    </div>
+  </div>
+</div>
+
+<!-- V3 画像报告页 -->
+<div id="view-v3" class="view hidden">
+  <div class="min-h-screen px-4 py-8 max-w-2xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <h2 id="v3-title" class="text-lg md:text-xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent"></h2>
+      <a id="v3-home" class="text-sm text-orange-500 hover:text-orange-600 cursor-pointer flex items-center gap-1"><i data-lucide="home" class="w-4 h-4"></i>首页</a>
+    </div>
+    <div id="v3-modules" class="space-y-4"></div>
+    <div class="flex flex-col gap-3 mt-8">
+      <button id="v3-to-v4" class="w-full py-3.5 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-orange-400 to-pink-400 hover:from-orange-500 hover:to-pink-500 shadow-md hover:shadow-lg transition-all active:scale-[.98] flex items-center justify-center gap-2">
+        <i data-lucide="sparkles" class="w-5 h-5"></i>趣聊点子
+      </button>
+      <div class="flex gap-3">
+        <button id="v3-save" class="flex-1 py-2.5 rounded-xl font-medium text-orange-500 text-sm bg-orange-50 hover:bg-orange-100 border border-orange-200 transition flex items-center justify-center gap-1">
+          <i data-lucide="bookmark" class="w-4 h-4"></i>保存此画像
+        </button>
+        <button id="v3-back-home" class="flex-1 py-2.5 rounded-xl font-medium text-gray-500 text-sm bg-gray-50 hover:bg-gray-100 border border-gray-200 transition flex items-center justify-center gap-1">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>返回首页
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- V4 场景选择 -->
+<div id="view-v4" class="view hidden">
+  <div class="min-h-screen flex items-center justify-center px-4 py-10">
+    <div class="bg-white/70 backdrop-blur-md rounded-3xl shadow-xl p-8 w-full mx-4 md:max-w-lg md:mx-auto">
+      <h2 class="text-lg md:text-xl font-bold text-center mb-6 bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">选择聊天场景</h2>
+      <div class="space-y-5">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-2">你们的关系</label>
+          <div class="flex flex-wrap gap-2">
+            <label class="flex items-center gap-1.5 cursor-pointer px-3 py-2 rounded-xl border border-gray-200 bg-white/60 hover:border-orange-300 transition has-[:checked]:border-orange-400 has-[:checked]:bg-orange-50 text-sm"><input type="radio" name="relation" value="恋人" class="accent-orange-500">恋人</label>
+            <label class="flex items-center gap-1.5 cursor-pointer px-3 py-2 rounded-xl border border-gray-200 bg-white/60 hover:border-orange-300 transition has-[:checked]:border-orange-400 has-[:checked]:bg-orange-50 text-sm"><input type="radio" name="relation" value="朋友" class="accent-orange-500">朋友</label>
+            <label class="flex items-center gap-1.5 cursor-pointer px-3 py-2 rounded-xl border border-gray-200 bg-white/60 hover:border-orange-300 transition has-[:checked]:border-orange-400 has-[:checked]:bg-orange-50 text-sm"><input type="radio" name="relation" value="同事" class="accent-orange-500">同事</label>
+            <label class="flex items-center gap-1.5 cursor-pointer px-3 py-2 rounded-xl border border-gray-200 bg-white/60 hover:border-orange-300 transition has-[:checked]:border-orange-400 has-[:checked]:bg-orange-50 text-sm"><input type="radio" name="relation" value="领导" class="accent-orange-500">领导</label>
+            <label class="flex items-center gap-1.5 cursor-pointer px-3 py-2 rounded-xl border border-gray-200 bg-white/60 hover:border-orange-300 transition has-[:checked]:border-orange-400 has-[:checked]:bg-orange-50 text-sm"><input type="radio" name="relation" value="长辈" class="accent-orange-500">长辈</label>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-2">年龄段</label>
+          <select id="v4-age" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white/60 focus:outline-none focus:ring-2 focus:ring-orange-300 text-sm">
+            <option value="">请选择</option>
+            <option>0-9岁</option><option>10-19岁</option><option>20-29岁</option><option>30-39岁</option><option>40-49岁</option>
+            <option>50-59岁</option><option>60-69岁</option><option>70-79岁</option><option>80-89岁</option><option>90-100岁</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-2">场景</label>
+          <div class="flex flex-wrap gap-2">
+            <label class="flex items-center gap-1.5 cursor-pointer px-3 py-2 rounded-xl border border-gray-200 bg-white/60 hover:border-orange-300 transition has-[:checked]:border-orange-400 has-[:checked]:bg-orange-50 text-sm"><input type="radio" name="scene" value="找话题" class="accent-orange-500">找话题</label>
+            <label class="flex items-center gap-1.5 cursor-pointer px-3 py-2 rounded-xl border border-gray-200 bg-white/60 hover:border-orange-300 transition has-[:checked]:border-orange-400 has-[:checked]:bg-orange-50 text-sm"><input type="radio" name="scene" value="表白" class="accent-orange-500">表白</label>
+            <label class="flex items-center gap-1.5 cursor-pointer px-3 py-2 rounded-xl border border-gray-200 bg-white/60 hover:border-orange-300 transition has-[:checked]:border-orange-400 has-[:checked]:bg-orange-50 text-sm"><input type="radio" name="scene" value="分手" class="accent-orange-500">分手</label>
+            <label class="flex items-center gap-1.5 cursor-pointer px-3 py-2 rounded-xl border border-gray-200 bg-white/60 hover:border-orange-300 transition has-[:checked]:border-orange-400 has-[:checked]:bg-orange-50 text-sm"><input type="radio" name="scene" value="节日祝福" class="accent-orange-500">节日祝福</label>
+          </div>
+        </div>
+        <div id="v4-holiday-group" class="hidden">
+          <label class="block text-xs font-medium text-gray-500 mb-2">节日</label>
+          <div class="flex flex-wrap gap-2">
+            <label class="flex items-center gap-1.5 cursor-pointer px-3 py-2 rounded-xl border border-gray-200 bg-white/60 hover:border-orange-300 transition has-[:checked]:border-orange-400 has-[:checked]:bg-orange-50 text-sm"><input type="radio" name="holiday" value="春节" class="accent-orange-500">春节</label>
+            <label class="flex items-center gap-1.5 cursor-pointer px-3 py-2 rounded-xl border border-gray-200 bg-white/60 hover:border-orange-300 transition has-[:checked]:border-orange-400 has-[:checked]:bg-orange-50 text-sm"><input type="radio" name="holiday" value="元旦" class="accent-orange-500">元旦</label>
+            <label class="flex items-center gap-1.5 cursor-pointer px-3 py-2 rounded-xl border border-gray-200 bg-white/60 hover:border-orange-300 transition has-[:checked]:border-orange-400 has-[:checked]:bg-orange-50 text-sm"><input type="radio" name="holiday" value="生日" class="accent-orange-500">生日</label>
+            <label class="flex items-center gap-1.5 cursor-pointer px-3 py-2 rounded-xl border border-gray-200 bg-white/60 hover:border-orange-300 transition has-[:checked]:border-orange-400 has-[:checked]:bg-orange-50 text-sm"><input type="radio" name="holiday" value="纪念日" class="accent-orange-500">纪念日</label>
+          </div>
+        </div>
+        <button id="v4-submit" class="w-full py-3 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-orange-400 to-pink-400 hover:from-orange-500 hover:to-pink-500 shadow-md hover:shadow-lg transition-all active:scale-[.98]">生成趣聊文案</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- V5 文案结果页 -->
+<div id="view-v5" class="view hidden">
+  <div class="min-h-screen px-4 py-8 max-w-2xl mx-auto">
+    <div class="flex items-center justify-between mb-2">
+      <h2 id="v5-title" class="text-lg md:text-xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent"></h2>
+      <a id="v5-back" class="text-sm text-orange-500 hover:text-orange-600 cursor-pointer flex items-center gap-1"><i data-lucide="arrow-left" class="w-4 h-4"></i>重新选择</a>
+    </div>
+    <p id="v5-subtitle" class="text-xs text-gray-400 mb-6"></p>
+    <div id="v5-cards" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+    <div class="flex gap-3 mt-8">
+      <button id="v5-home" class="flex-1 py-2.5 rounded-xl font-medium text-gray-500 text-sm bg-gray-50 hover:bg-gray-100 border border-gray-200 transition flex items-center justify-center gap-1"><i data-lucide="home" class="w-4 h-4"></i>返回首页</button>
+      <button id="v5-save" class="flex-1 py-2.5 rounded-xl font-medium text-orange-500 text-sm bg-orange-50 hover:bg-orange-100 border border-orange-200 transition flex items-center justify-center gap-1"><i data-lucide="bookmark" class="w-4 h-4"></i>保存文案</button>
+      <button id="v5-switch" class="flex-1 py-2.5 rounded-xl font-medium text-gray-500 text-sm bg-gray-50 hover:bg-gray-100 border border-gray-200 transition flex items-center justify-center gap-1"><i data-lucide="users" class="w-4 h-4"></i>切换人物</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
