@@ -1,98 +1,67 @@
 const http = require('http');
 const https = require('https');
-const fs = require('fs');
-const path = require('path');
 
-const PORT = 3000;
-const API_KEY = ' sk-7689b637f8164f4b87673685f0aa8177';
-
-const MIME = {
-  '.html': 'text/html; charset=utf-8',
-  '.js': 'application/javascript; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.json': 'application/json',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon'
-};
+// 监听Railway的端口（默认3000）
+const PORT = process.env.PORT || 3000;
+// 替换成你自己的DeepSeek密钥
+const API_KEY = 'sk-你的DeepSeek密钥';
 
 const server = http.createServer((req, res) => {
-  // 关键：处理跨域预检请求（OPTIONS）
+  // 全局开启跨域（允许所有域名访问）
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // 处理OPTIONS预检请求（解决跨域）
   if (req.method === 'OPTIONS') {
-    res.writeHead(204, {
-      'Access-Control-Allow-Origin': 'https://mashashak0717.github.io', // 你的GitHub Pages地址
-      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Max-Age': '86400'
-    });
+    res.writeHead(204);
     res.end();
     return;
   }
 
-  // 处理POST请求
+  // 只处理/api/chat的POST请求（你的AI接口）
   if (req.method === 'POST' && req.url === '/api/chat') {
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', () => {
+      // 代理请求到DeepSeek API
       const proxyReq = https.request({
         hostname: 'api.deepseek.com',
         path: '/v1/chat/completions',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + API_KEY
+          'Authorization': 'Bearer ' + sk-7689b637f8164f4b87673685f0aa8177
         }
       }, proxyRes => {
         let data = '';
         proxyRes.on('data', chunk => data += chunk);
         proxyRes.on('end', () => {
-          // 给POST请求加上跨域头
-          res.writeHead(proxyRes.statusCode, {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': 'https://mashashak0717.github.io' // 这里也要加上
-          });
+          res.writeHead(proxyRes.statusCode, { 'Content-Type': 'application/json' });
           res.end(data);
         });
       });
 
+      // 错误处理
       proxyReq.on('error', err => {
         console.error(err);
-        res.writeHead(500, {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': 'https://mashashak0717.github.io'
-        });
+        res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'API请求失败' }));
       });
 
+      // 发送请求体
       proxyReq.write(body);
       proxyReq.end();
     });
     return;
   }
 
-  // 静态文件服务（如果需要）
-  let filePath = '.' + req.url;
-  if (filePath === './') filePath = './index.html';
-  const extname = path.extname(filePath);
-  const contentType = MIME[extname] || 'text/plain';
-
-  fs.readFile(filePath, (err, content) => {
-    if (err) {
-      if (err.code === 'ENOENT') {
-        res.writeHead(404, { 'Content-Type': 'text/html' });
-        res.end('404 Not Found');
-      } else {
-        res.writeHead(500);
-        res.end('Server Error: ' + err.code);
-      }
-    } else {
-      res.writeHead(200, { 'Content-Type': contentType });
-      res.end(content, 'utf-8');
-    }
-  });
+  // 其他请求返回OK（用于验证服务是否正常）
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Server is running!');
 });
 
+// 启动服务
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
