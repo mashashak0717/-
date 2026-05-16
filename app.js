@@ -107,7 +107,7 @@ async function fetchAIResult(type, context) {
   }
   try {
     console.log('发送prompt:', prompt.substring(0, 100));
-    var res = await fetch('/api/chat', {
+    var res = await fetch('https://alert-harmony-production-8886.up.railway.app/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
